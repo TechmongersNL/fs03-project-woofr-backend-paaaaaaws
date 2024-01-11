@@ -22,6 +22,19 @@ def create_owner(db: Session, owner: dogOwnersSchemas.DogOwnerCreate):
     db.refresh(db_owner)
     return db_owner  
 
+#update_about_me
+def update_about_me(db: Session, dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate):
+    existing_owner = db.query(models.Dog_owner).filter(models.Dog_owner.id == dog_owner_id).first()
+
+    if existing_owner:
+        for key, value in updated_data.dict().items():
+            setattr(existing_owner, key, value)
+
+        db.commit()
+        db.refresh(existing_owner)
+
+    return existing_owner 
+
 #delete owner
 def delete_owner(db: Session, dog_owner_id: int):
     owner = db.query(models.Dog_owner).filter(models.Dog_owner.id == dog_owner_id).first()

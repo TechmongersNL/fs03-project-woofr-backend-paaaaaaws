@@ -94,4 +94,20 @@ def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Owner not found")
     return result
 
-# Need to implement a Put /owners/me to update about me details
+# PUT /owners/{id} - update the about me details for an owner by an id
+@app.put("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerUpdate)
+def update_owner(dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate, db: Session = Depends(get_db)):
+    existing_owner = db.query(models.Dog_owner).filter(models.Dog_owner.id == dog_owner_id).first()
+
+    if not existing_owner:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    for key, value in updated_data.dict().items():
+        setattr(existing_owner, key, value)
+
+    db.commit()
+    db.refresh(existing_owner)
+
+    return existing_owner
+
+

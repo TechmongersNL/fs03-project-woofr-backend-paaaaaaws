@@ -15,9 +15,11 @@ class DogOwnerCreate(BaseModel):
     username: str
     about_me: str
     
+    
+#update dog owner about_me
 class DogOwnerUpdate(BaseModel):
-    username:str
     about_me: str
+    
     
 #for one dog owner
 class DogOwner(DogOwnerBase):
