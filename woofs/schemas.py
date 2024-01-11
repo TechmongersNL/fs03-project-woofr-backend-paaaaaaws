@@ -15,6 +15,7 @@ class WoofBase(BaseModel):
 class WoofCreate(BaseModel):
     message: str
     
+#for one woof 
 class Woof(WoofBase):
     
     class Config:

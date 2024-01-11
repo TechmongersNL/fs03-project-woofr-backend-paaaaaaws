@@ -4,6 +4,7 @@ import sys
 import os
 import datetime
 
+# Routing to the app directory
 path = os.path.abspath("app")
 sys.path.append(path)
 
