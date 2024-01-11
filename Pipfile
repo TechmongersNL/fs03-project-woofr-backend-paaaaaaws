@@ -9,6 +9,7 @@ pydantic = "*"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 python-dotenv = "*"
+alembic = "*"
 
 [dev-packages]
 
