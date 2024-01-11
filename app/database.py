@@ -6,9 +6,10 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
 load_dotenv()
+database_url = os.environ.get("DATABASE_URL")
 
 # create SQLAlchemy engine
-engine = create_engine(os.environ.DATABASE_URL)
+engine = create_engine(database_url)
 
 # create SessionLocal class with sessionmaker
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
