@@ -55,5 +55,5 @@ def delete_woof_by_id(woof_id: int, db: Session = Depends(get_db)):
 def fetch_woofs(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     results = woofs.get_woofs(db, skip=skip, limit=limit)
     if results is None:
-        raise HTTPException(status_code=404, detail="No woofs found")
+        return []
     return results
