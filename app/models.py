@@ -2,6 +2,7 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 import sys
 import os
+import datetime
 
 path = os.path.abspath("app")
 sys.path.append(path)
@@ -13,6 +14,6 @@ class Woof(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     message = Column(String)
-    created_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 
