@@ -24,8 +24,6 @@ class Dog_owner(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     username = Column(String, unique=True, index=True)
     about_me = Column(String)
-    # email and password_hash should be added later for auth 
-    # email = Column(String)
-    # password_hash = Column(String)
+ 
 
 
