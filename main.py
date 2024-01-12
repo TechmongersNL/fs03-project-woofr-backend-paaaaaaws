@@ -26,6 +26,8 @@ app.add_middleware(
 )
 
 # DB Dependency
+
+
 def get_db():
     db = database.SessionLocal()
     try:
@@ -35,12 +37,14 @@ def get_db():
 
 # WOOFS ENDPOINTS
 # POST /woofs – to create a Woof
-        
+
+
 @app.post("/woofs", response_model=woofsSchemas.Woof)
 def post_woof(woof: woofsSchemas.WoofCreate, db: Session = Depends(get_db)):
     return woofs.create_woof(db, woof=woof)
 
 # DELETE /woofs/{id} – to delete a Woof
+
 
 @app.delete("/woofs{id}", response_model=woofsSchemas.Woof)
 def delete_woof_by_id(woof_id: int, db: Session = Depends(get_db)):
@@ -60,8 +64,6 @@ def fetch_woofs(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     return results
 
 
-
-
 # Dog Owner Endpoints
 
 # GET /owners - get a list of all owners
@@ -73,6 +75,8 @@ def fetch_owners(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     return results
 
 # GET /owners/{id} - get an owner by id
+
+
 @app.get("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerBase)
 def get_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
     result = dogOwners.get_owner(db, dog_owner_id=dog_owner_id)
@@ -81,11 +85,13 @@ def get_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
     return result
 
 # POST /owners - create an owner with username and about_me
+
+
 @app.post("/owners", response_model=dogOwnersSchemas.DogOwner)
 def create_an_owner(owner: dogOwnersSchemas.DogOwnerCreate, db: Session = Depends(get_db)):
     return dogOwners.create_owner(db, owner=owner)
-    
-    
+
+
 # DELETE /owners/{id} - delete an owner by id
 @app.delete("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerBase)
 def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
@@ -95,9 +101,12 @@ def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
     return result
 
 # PUT /owners/{id} - update the about me details for an owner by an id
+
+
 @app.put("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerUpdate)
 def update_owner(dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate, db: Session = Depends(get_db)):
-    existing_owner = db.query(models.Dog_owner).filter(models.Dog_owner.id == dog_owner_id).first()
+    existing_owner = db.query(models.Dog_owner).filter(
+        models.Dog_owner.id == dog_owner_id).first()
 
     if not existing_owner:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -111,3 +120,6 @@ def update_owner(dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdat
     return existing_owner
 
 
+@app.get("/healthz")
+def health_check():
+    return {"status": "woof!"}
