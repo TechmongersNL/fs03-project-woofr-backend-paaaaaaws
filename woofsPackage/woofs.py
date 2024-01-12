@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from . import  schemas
+from . import  woofsSchemas
 from app import models
 
 #get woofs
@@ -9,7 +9,7 @@ def get_woofs(db: Session, skip: int = 0, limit: int = 20):
     return woofs
 
 #create woof
-def create_woof(db: Session, woof: schemas.Woof):
+def create_woof(db: Session, woof: woofsSchemas.Woof):
     db_woof = models.Woof(**woof.dict())
     db.add(db_woof)
     db.commit()

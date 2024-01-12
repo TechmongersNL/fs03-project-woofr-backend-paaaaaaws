@@ -16,5 +16,14 @@ class Woof(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     message = Column(String)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+
+class Dog_owner(Base):
+    __tablename__ = "dog_owners"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    username = Column(String, unique=True, index=True)
+    about_me = Column(String)
+ 
 
 
