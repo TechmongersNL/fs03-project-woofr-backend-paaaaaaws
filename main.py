@@ -35,6 +35,13 @@ def get_db():
     finally:
         db.close()
 
+
+# AUTH ENDPOINTS
+@app.post("/owners/login", response_model=dogOwnersSchemas.Token)
+def login_owner(dog_owner_credentials: dogOwnersSchemas.DogOwnerCredentials, db: Session = Depends(get_db)):
+    return dogOwners.login_owner(db, dog_owner_credentials=dog_owner_credentials)
+
+
 # WOOFS ENDPOINTS
 # POST /woofs – to create a Woof
 
