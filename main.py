@@ -2,7 +2,7 @@ from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from dotenv import load_dotenv
 from woofsPackage import woofsSchemas, woofs
-from dogOwnersPackage import dogOwnersSchemas, dogOwners
+from dogOwnersPackage import dogOwnersSchemas, dogOwners, authentication
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app import database, models
@@ -39,7 +39,7 @@ def get_db():
 # AUTH ENDPOINTS
 @app.post("/owners/login", response_model=dogOwnersSchemas.Token)
 def login_owner(dog_owner_credentials: dogOwnersSchemas.DogOwnerCredentials, db: Session = Depends(get_db)):
-    return dogOwners.login_owner(db, dog_owner_credentials=dog_owner_credentials)
+    return authentication.login_owner(db, dog_owner_credentials=dog_owner_credentials)
 
 
 # WOOFS ENDPOINTS
