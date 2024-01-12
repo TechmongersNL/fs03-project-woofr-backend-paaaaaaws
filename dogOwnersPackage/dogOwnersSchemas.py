@@ -47,5 +47,4 @@ class Token(BaseModel):
 
 
 class TokenPayload(BaseModel):
-    exp: int
-    sub: str
+    id: int | None = None

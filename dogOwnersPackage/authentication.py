@@ -55,5 +55,5 @@ def login_owner(db: Session, dog_owner_credentials: dogOwnersSchemas.DogOwnerCre
         raise HTTPException(status_code=404, detail=user_password_error)
     if not verify_password(dog_owner_credentials.password, db_owner.password_hash):
         raise HTTPException(status_code=401, detail=user_password_error)
-    return {"access_token": create_access_token(db_owner.email),
+    return {"access_token": create_access_token(db_owner.id),
             "token_type": "bearer"}
