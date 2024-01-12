@@ -29,7 +29,7 @@ class DogOwnerMe(BaseModel):
 
 # update dog owner about_me
 class DogOwnerUpdate(BaseModel):
-    userame: str
+    username: str
     about_me: str
 
 

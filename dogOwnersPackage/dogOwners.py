@@ -41,16 +41,10 @@ def create_owner(db: Session, dog_owner: dogOwnersSchemas.DogOwnerCreate):
 
 def update(db: Session, dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate):
     existing_owner = db.query(models.Dog_owner).filter(
-        models.Dog_owner.id == dog_owner_id).first()
-
-    if existing_owner:
-        for key, value in updated_data.dict().items():
-            setattr(existing_owner, key, value)
-
-        db.commit()
-        db.refresh(existing_owner)
-
-    return existing_owner
+        models.Dog_owner.id == dog_owner_id)
+    existing_owner.update(updated_data.dict(), synchronize_session=False)
+    db.commit()
+    return existing_owner.first()
 
 # delete owner
 
