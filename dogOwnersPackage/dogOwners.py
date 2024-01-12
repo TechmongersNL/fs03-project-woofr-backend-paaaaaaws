@@ -1,6 +1,19 @@
 from sqlalchemy.orm import Session
 from . import dogOwnersSchemas
 from app import models
+from passlib.context import CryptContext
+
+password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+# for auth
+def get_hashed_password(password: str) -> str:
+    return password_context.hash(password)
+
+
+def verify_password(password: str, hashed_pass: str) -> bool:
+    return password_context.verify(password, hashed_pass)
+
 
 # get_owner
 
@@ -23,8 +36,9 @@ def get_owners(db: Session, skip: int = 0, limit: int = 20):
 
 
 def create_owner(db: Session, dog_owner: dogOwnersSchemas.DogOwnerCreate):
+    password_hash = get_hashed_password(password=dog_owner.password)
     db_owner = models.Dog_owner(
-        email=dog_owner.email, password_hash=dog_owner.password)
+        email=dog_owner.email, password_hash=password_hash)
     db.add(db_owner)
     db.commit()
     db.refresh(db_owner)
