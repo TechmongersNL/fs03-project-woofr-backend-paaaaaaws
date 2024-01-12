@@ -38,9 +38,13 @@ def get_db():
 
 
 # AUTH ENDPOINTS
+
+# POST /owners/login - login for owners
 @app.post("/owners/login", response_model=dogOwnersSchemas.Token)
 def login_owner(dog_owner_credentials: dogOwnersSchemas.DogOwnerCredentials, db: Session = Depends(get_db)):
     return authentication.login_owner(db, dog_owner_credentials=dog_owner_credentials)
+
+# POST /docslogin - Authentication via the FastAPI documentation site
 
 
 @app.post("/docslogin", response_model=dogOwnersSchemas.Token)
@@ -48,6 +52,7 @@ def login_with_form_data(
     dog_owner_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
+    # Setting the username field in the request form to the email field in the credentials schema
     return authentication.login_owner(db, dog_owner_credentials=dogOwnersSchemas.DogOwnerCredentials(email=dog_owner_credentials.username, password=dog_owner_credentials.password))
 
 # WOOFS ENDPOINTS
