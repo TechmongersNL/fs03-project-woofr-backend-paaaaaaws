@@ -84,12 +84,18 @@ def get_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Owner not found")
     return result
 
-# POST /owners - create an owner on signup
+
+# POST /owners - create an owner on signup. Email address is a unique value
 
 
-@app.post("/owners", response_model=dogOwnersSchemas.DogOwnerBase)
-def create_an_owner(owner: dogOwnersSchemas.DogOwnerCreate, db: Session = Depends(get_db)):
-    return dogOwners.create_owner(db, owner=owner)
+@app.post("/owners", response_model=dogOwnersSchemas.DogOwnerMe)
+def create_an_owner(dog_owner: dogOwnersSchemas.DogOwnerCreate, db: Session = Depends(get_db)):
+    try:
+        result = dogOwners.create_owner(db, dog_owner=dog_owner)
+    except:
+        raise HTTPException(
+            status_code=400, detail="Please use a different email and/or password")
+    return result
 
 
 # DELETE /owners/{id} - delete an owner by id

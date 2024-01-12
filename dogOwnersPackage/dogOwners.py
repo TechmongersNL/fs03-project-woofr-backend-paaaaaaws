@@ -24,7 +24,7 @@ def get_owners(db: Session, skip: int = 0, limit: int = 20):
 
 def create_owner(db: Session, dog_owner: dogOwnersSchemas.DogOwnerCreate):
     db_owner = models.Dog_owner(
-        email=dog_owner.email, password=dog_owner.password)
+        email=dog_owner.email, password_hash=dog_owner.password)
     db.add(db_owner)
     db.commit()
     db.refresh(db_owner)

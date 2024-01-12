@@ -16,9 +16,15 @@ class DogOwnerCreate(BaseModel):
     password: str
 
 
-# credentials for dog owner
+# credentials for dog owner for log in
 class DogOwnerCredentials(DogOwnerCreate):
     pass
+
+
+# basic identification of dog owner
+class DogOwnerMe(BaseModel):
+    id: int
+    email: str
 
 
 # update dog owner about_me
