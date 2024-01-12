@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from dotenv import load_dotenv
+from fastapi.security import OAuth2PasswordRequestForm
 from woofsPackage import woofsSchemas, woofs
 from dogOwnersPackage import dogOwnersSchemas, dogOwners, authentication
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,6 +42,13 @@ def get_db():
 def login_owner(dog_owner_credentials: dogOwnersSchemas.DogOwnerCredentials, db: Session = Depends(get_db)):
     return authentication.login_owner(db, dog_owner_credentials=dog_owner_credentials)
 
+
+@app.post("/docslogin", response_model=dogOwnersSchemas.Token)
+def login_with_form_data(
+    dog_owner_credentials: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    return authentication.login_owner(db, dog_owner_credentials=dogOwnersSchemas.DogOwnerCredentials(email=dog_owner_credentials.username, password=dog_owner_credentials.password))
 
 # WOOFS ENDPOINTS
 # POST /woofs – to create a Woof
@@ -117,17 +125,7 @@ def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerUpdate)
-def update_owner(dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate, db: Session = Depends(get_db)):
-    existing_owner = db.query(models.Dog_owner).filter(
-        models.Dog_owner.id == dog_owner_id).first()
-
-    if not existing_owner:
-        raise HTTPException(status_code=404, detail="Owner not found")
-
-    for key, value in updated_data.dict().items():
-        setattr(existing_owner, key, value)
-
-    db.commit()
-    db.refresh(existing_owner)
-
-    return existing_owner
+async def update_owner(updated_data: dogOwnersSchemas.DogOwnerUpdate, current_owner: dogOwnersSchemas.DogOwnerBase = Depends(authentication.get_current_owner), db: Session = Depends(get_db)):
+    updated_owner = dogOwners.update(
+        db, current_owner.id, updated_data=updated_data)
+    return updated_owner

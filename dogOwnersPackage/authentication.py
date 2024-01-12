@@ -6,9 +6,9 @@ from typing import Annotated, Union, Any
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from app import models
+from app import models, database
 from sqlalchemy.orm import Session
-from . import dogOwnersSchemas
+from . import dogOwnersSchemas, dogOwners
 
 load_dotenv()
 
@@ -21,7 +21,8 @@ ALGORITHM = "HS256"
 JWT_SECRET_KEY = os.environ['JWT_SECRET_KEY']
 
 # Authorized request configuration
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/owners/login")
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/docslogin", scheme_name="JWT")
 
 # Authentication functions
 
@@ -57,3 +58,25 @@ def login_owner(db: Session, dog_owner_credentials: dogOwnersSchemas.DogOwnerCre
         raise HTTPException(status_code=401, detail=user_password_error)
     return {"access_token": create_access_token(db_owner.id),
             "token_type": "bearer"}
+
+
+async def get_current_owner(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        db = database.SessionLocal()
+
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        dog_owner_id: str = payload.get("sub")
+        if dog_owner_id is None:
+            raise credentials_exception
+        token_data = dogOwnersSchemas.TokenPayload(id=dog_owner_id)
+    except JWTError:
+        raise credentials_exception
+    owner = dogOwners.get_owner(db, dog_owner_id=token_data.id)
+    if owner is None:
+        raise credentials_exception
+    return owner
