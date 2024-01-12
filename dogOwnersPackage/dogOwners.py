@@ -36,7 +36,7 @@ def create_owner(db: Session, dog_owner: dogOwnersSchemas.DogOwnerCreate):
     db.refresh(db_owner)
     return db_owner
 
-# update owner username and about_me sections
+# update owner username and about_me sections *Authenticated Request*
 
 
 def update(db: Session, dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate):

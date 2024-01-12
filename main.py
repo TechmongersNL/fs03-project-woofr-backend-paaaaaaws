@@ -113,7 +113,7 @@ def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Owner not found")
     return result
 
-# PUT /owners/{id} - update the username and about me details for an owner by an id
+# *Authenticated Request* PUT /owners/{id} - update the username and about me details for an owner by an id
 
 
 @app.put("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerUpdate)

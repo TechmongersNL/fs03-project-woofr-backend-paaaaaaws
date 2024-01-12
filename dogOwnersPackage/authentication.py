@@ -2,21 +2,26 @@ import os
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from typing import Union, Any
-from jose import jwt
-from fastapi import HTTPException
+from typing import Annotated, Union, Any
+from jose import jwt, JWTError
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from app import models
 from sqlalchemy.orm import Session
 from . import dogOwnersSchemas
 
 load_dotenv()
 
+# Token encoding configuration
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 ALGORITHM = "HS256"
 JWT_SECRET_KEY = os.environ['JWT_SECRET_KEY']
+
+# Authorized request configuration
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/owners/login")
 
 # Authentication functions
 
@@ -50,5 +55,5 @@ def login_owner(db: Session, dog_owner_credentials: dogOwnersSchemas.DogOwnerCre
         raise HTTPException(status_code=404, detail=user_password_error)
     if not verify_password(dog_owner_credentials.password, db_owner.password_hash):
         raise HTTPException(status_code=401, detail=user_password_error)
-    return {"access_token": create_access_token(f"{db_owner.id}:{db_owner.email}"),
+    return {"access_token": create_access_token(db_owner.email),
             "token_type": "bearer"}
