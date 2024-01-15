@@ -10,8 +10,6 @@ from app import database, models
 
 load_dotenv()  # take environment variables from .env.
 
-models.Base.metadata.create_all(bind=database.engine)
-
 app = FastAPI()
 
 # Middleware
@@ -105,6 +103,7 @@ def get_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
     return result
 
 
+
 # POST /owners - create an owner on signup. Email address is a unique value
 
 
@@ -118,6 +117,7 @@ def create_an_owner(dog_owner: dogOwnersSchemas.DogOwnerCreate, db: Session = De
     return result
 
 
+
 # DELETE /owners/{id} - delete an owner by id
 @app.delete("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerBase)
 def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
@@ -125,6 +125,7 @@ def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
     if result is None:
         raise HTTPException(status_code=404, detail="Owner not found")
     return result
+
 
 # *Authenticated Request* PUT /owners/{id} - update the username and about me details for an owner by an id
 
@@ -134,3 +135,8 @@ async def update_owner(updated_data: dogOwnersSchemas.DogOwnerUpdate, current_ow
     updated_owner = dogOwners.update(
         db, current_owner.id, updated_data=updated_data)
     return updated_owner
+
+
+@app.get("/healthz")
+def health_check():
+    return {"status": "woof!"}
