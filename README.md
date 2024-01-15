@@ -31,4 +31,5 @@ Then, create a `.env` file in the root of the project, and add:
 
 ```shell
 DATABASE_URL=postgresql://postgres:secret@localhost:5445/postgres
+JWT_SECRET_KEY=b0ae157027004f9a1eabb7214b84cc93340efd00075bc9895ba91ccbab841aec
 ```

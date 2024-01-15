@@ -1,43 +1,57 @@
 from sqlalchemy.orm import Session
-from . import  dogOwnersSchemas
+from . import dogOwnersSchemas, authentication
 from app import models
 
-#get_owner
+
+# for auth
+
+
+# get_owner
+
+
 def get_owner(db: Session, dog_owner_id: int):
-    dog_owner = db.query(models.Dog_owner).filter(models.Dog_owner.id == dog_owner_id).first()
+    dog_owner = db.query(models.Dog_owner).filter(
+        models.Dog_owner.id == dog_owner_id).first()
     print(dog_owner)
     return dog_owner
 
-#get_owners
+# get_owners
+
+
 def get_owners(db: Session, skip: int = 0, limit: int = 20):
     owners = db.query(models.Dog_owner).offset(skip).limit(limit).all()
     print(owners)
     return owners
 
-#create_owner
-def create_owner(db: Session, owner: dogOwnersSchemas.DogOwnerCreate):
-    db_owner = models.Dog_owner(**owner.dict())
+# create_owner
+
+
+def create_owner(db: Session, dog_owner: dogOwnersSchemas.DogOwnerCreate):
+    password_hash = authentication.get_hashed_password(
+        password=dog_owner.password)
+    db_owner = models.Dog_owner(
+        email=dog_owner.email, password_hash=password_hash)
     db.add(db_owner)
     db.commit()
     db.refresh(db_owner)
-    return db_owner  
+    return db_owner
 
-#update_about_me
-def update_about_me(db: Session, dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate):
-    existing_owner = db.query(models.Dog_owner).filter(models.Dog_owner.id == dog_owner_id).first()
+# update owner username and about_me sections *Authenticated Request*
 
-    if existing_owner:
-        for key, value in updated_data.dict().items():
-            setattr(existing_owner, key, value)
 
-        db.commit()
-        db.refresh(existing_owner)
+def update(db: Session, dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate):
+    existing_owner = db.query(models.Dog_owner).filter(
+        models.Dog_owner.id == dog_owner_id)
+    existing_owner.update(updated_data.dict(), synchronize_session=False)
+    db.commit()
+    return existing_owner.first()
 
-    return existing_owner 
+# delete owner
 
-#delete owner
+
 def delete_owner(db: Session, dog_owner_id: int):
-    owner = db.query(models.Dog_owner).filter(models.Dog_owner.id == dog_owner_id).first()
+    owner = db.query(models.Dog_owner).filter(
+        models.Dog_owner.id == dog_owner_id).first()
     db.delete(owner)
     db.commit()
     return owner

@@ -1,8 +1,9 @@
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from dotenv import load_dotenv
+from fastapi.security import OAuth2PasswordRequestForm
 from woofsPackage import woofsSchemas, woofs
-from dogOwnersPackage import dogOwnersSchemas, dogOwners
+from dogOwnersPackage import dogOwnersSchemas, dogOwners, authentication
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app import database, models
@@ -32,6 +33,25 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# AUTH ENDPOINTS
+
+# POST /owners/login - login for owners
+@app.post("/owners/login", response_model=dogOwnersSchemas.Token)
+def login_owner(dog_owner_credentials: dogOwnersSchemas.DogOwnerCredentials, db: Session = Depends(get_db)):
+    return authentication.login_owner(db, dog_owner_credentials=dog_owner_credentials)
+
+# POST /docslogin - Authentication via the FastAPI documentation site
+
+
+@app.post("/docslogin", response_model=dogOwnersSchemas.Token)
+def login_with_form_data(
+    dog_owner_credentials: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    # Setting the username field in the request form to the email field in the credentials schema
+    return authentication.login_owner(db, dog_owner_credentials=dogOwnersSchemas.DogOwnerCredentials(email=dog_owner_credentials.username, password=dog_owner_credentials.password))
 
 # WOOFS ENDPOINTS
 # POST /woofs – to create a Woof
@@ -82,12 +102,20 @@ def get_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Owner not found")
     return result
 
-# POST /owners - create an owner with username and about_me
 
 
-@app.post("/owners", response_model=dogOwnersSchemas.DogOwner)
-def create_an_owner(owner: dogOwnersSchemas.DogOwnerCreate, db: Session = Depends(get_db)):
-    return dogOwners.create_owner(db, owner=owner)
+# POST /owners - create an owner on signup. Email address is a unique value
+
+
+@app.post("/owners", response_model=dogOwnersSchemas.DogOwnerMe)
+def create_an_owner(dog_owner: dogOwnersSchemas.DogOwnerCreate, db: Session = Depends(get_db)):
+    try:
+        result = dogOwners.create_owner(db, dog_owner=dog_owner)
+    except:
+        raise HTTPException(
+            status_code=400, detail="Please use a different email and/or password")
+    return result
+
 
 
 # DELETE /owners/{id} - delete an owner by id
@@ -98,24 +126,15 @@ def delete_owner_by_id(dog_owner_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Owner not found")
     return result
 
-# PUT /owners/{id} - update the about me details for an owner by an id
+
+# *Authenticated Request* PUT /owners/{id} - update the username and about me details for an owner by an id
 
 
 @app.put("/owners/{id}", response_model=dogOwnersSchemas.DogOwnerUpdate)
-def update_owner(dog_owner_id: int, updated_data: dogOwnersSchemas.DogOwnerUpdate, db: Session = Depends(get_db)):
-    existing_owner = db.query(models.Dog_owner).filter(
-        models.Dog_owner.id == dog_owner_id).first()
-
-    if not existing_owner:
-        raise HTTPException(status_code=404, detail="Category not found")
-
-    for key, value in updated_data.dict().items():
-        setattr(existing_owner, key, value)
-
-    db.commit()
-    db.refresh(existing_owner)
-
-    return existing_owner
+async def update_owner(updated_data: dogOwnersSchemas.DogOwnerUpdate, current_owner: dogOwnersSchemas.DogOwnerBase = Depends(authentication.get_current_owner), db: Session = Depends(get_db)):
+    updated_owner = dogOwners.update(
+        db, current_owner.id, updated_data=updated_data)
+    return updated_owner
 
 
 @app.get("/healthz")
