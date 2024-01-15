@@ -47,8 +47,8 @@ def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> 
 
 
 def login_owner(db: Session, dog_owner_credentials: dogOwnersSchemas.DogOwnerCredentials):
-    db_owner = db.query(models.Dog_owner).filter(
-        models.Dog_owner.email == dog_owner_credentials.email).first()
+    db_owner = db.query(models.DogOwnerwner).filter(
+        models.DogOwner.email == dog_owner_credentials.email).first()
 
     user_password_error = "Incorrect username or password"
 

@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordRequestForm
 from woofsPackage import woofsSchemas, woofs
-from dogOwnersPackage import dogOwnersSchemas, dogOwners, authentication
+from dog_owners import dogOwnersSchemas, dogOwners, authentication
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app import database, models

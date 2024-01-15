@@ -18,7 +18,7 @@ class Woof(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 
-class Dog_owner(Base):
+class DogOwner(Base):
     __tablename__ = "dog_owners"
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
