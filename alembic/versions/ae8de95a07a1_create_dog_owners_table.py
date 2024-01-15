@@ -24,9 +24,9 @@ def upgrade() -> None:
                     sa.Column('id', sa.Integer(),
                               autoincrement=True, nullable=False),
                     sa.Column('username', sa.String(),
-                              existing_type=sa.VARCHAR(), nullable=False),
+                              nullable=False),
                     sa.Column('about_me', sa.String(),
-                              existing_type=sa.VARCHAR(), nullable=False),
+                              nullable=False),
                     sa.PrimaryKeyConstraint('id')
                     )
     op.add_column('dog_owners', sa.Column('email', sa.String(), nullable=True))
